@@ -1,7 +1,13 @@
-﻿namespace MTCGNew {
+﻿using MTCGNew.Cards;
+using System.Threading.Channels;
+
+namespace MTCGNew {
     internal class Program {
         static void Main(string[] args) {
-            Console.WriteLine("Hello, World!");
+            Package package = new();
+            foreach(Card card in package.Cards) {
+                Console.WriteLine(card.Cardname);
+            }
         }
     }
 }

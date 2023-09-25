@@ -23,6 +23,10 @@ namespace MTCGNew.Cards {
 
         public ElementType Elementtype { get; private set; }
 
+        public virtual void PrintStats() {
+            Console.WriteLine($"Cardname: {_cardname}, Damage: {_damage}, Elementtype: {Elementtype}");
+        }
+
         //Constructor
         public Card(int damage, string cardname, ElementType element)
         {

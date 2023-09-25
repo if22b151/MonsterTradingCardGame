@@ -6,7 +6,7 @@ namespace MTCGNew {
         static void Main(string[] args) {
             Package package = new();
             foreach(Card card in package.Cards) {
-                Console.WriteLine(card.Cardname);
+                card.PrintStats();
             }
         }
     }

@@ -12,6 +12,9 @@ namespace MTCGNew.Cards {
 
         public SpeciesType Speciestype { get; }
 
+        public override void PrintStats() {
+            Console.WriteLine($"Cardname: {_cardname}, Damage: {_damage}, Elementtype: {Elementtype}, SpeciesType: {Speciestype}");
+        }
 
         //Constructor
         public MonsterCard(int damage, string cardname, ElementType element, SpeciesType species) : base(damage, cardname, element) {

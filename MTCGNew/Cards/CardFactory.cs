@@ -17,46 +17,76 @@ namespace MTCGNew.Cards
 
         public int DecideDamage() {
             Random random = new();
-            return random.Next(21);
+            return random.Next(5, 21);
         }
 
-        public ElementType DecideElementType() {
-            Array enumvalues = Enum.GetValues(typeof(ElementType));
-            Random random = new();
-            ElementType elementType = (ElementType)enumvalues.GetValue(random.Next(enumvalues.Length));
-            return elementType;
-        }
-
-        public SpeciesType DecideSpeciesType() {
-            Array enumvalues = Enum.GetValues(typeof(SpeciesType));
-            Random random = new();
-            SpeciesType speciesType = (SpeciesType)enumvalues.GetValue(random.Next(enumvalues.Length));
-            return speciesType;
-        }
-        public string DecideCardNameMonster(ElementType elementtype, SpeciesType speciestype) {
-            if (elementtype == ElementType.fire && speciestype == SpeciesType.Wizzard) {
-                return "FireWizard";
-            } else if (elementtype == ElementType.fire && speciestype == SpeciesType.Dragon) {
-                return "FireDragon";
+        public ElementType DecideElementTypeforSpells(SpellCardNames spellcardname) {
+            if(spellcardname.ToString().StartsWith("Water")) {
+                return ElementType.water;
+            } else if(spellcardname.ToString().StartsWith("Fire")) {
+                return ElementType.fire;
+            } else { 
+                return ElementType.normal; 
             }
-            return "FireElve";
         }
 
-        public string DecideCardNameSpell(ElementType elementtype) {
-            return "RegularSpell";
+        public ElementType DecideElementTypeforMonsters(MonsterCardNames monstercardname) {
+            if (monstercardname.ToString().StartsWith("Water")) {
+                return ElementType.water;
+            } else if (monstercardname.ToString().StartsWith("Fire")) {
+                return ElementType.fire;
+            } else {
+                return ElementType.normal;
+            }
+        }
+
+
+        public SpeciesType DecideSpeciesType(MonsterCardNames monstercardname) {
+            if(monstercardname.ToString().EndsWith("Goblin")) {
+                return SpeciesType.Goblin;
+            }
+            else if (monstercardname.ToString().EndsWith("Dragon")) {
+                return SpeciesType.Dragon;
+            }
+            else if(monstercardname.ToString().EndsWith("Wizzard")) {
+                return SpeciesType.Wizzard;
+            }
+            else if(monstercardname.ToString().EndsWith("Ork")) {
+                return SpeciesType.Ork;
+            }
+            else if(monstercardname.ToString().EndsWith("Knight")) {
+                return SpeciesType.Knight;
+            }
+            else if(monstercardname.ToString().EndsWith("Kraken")) {
+                return SpeciesType.Kraken;
+            }else {
+                return SpeciesType.Elve;
+            }
+        }
+        public MonsterCardNames DecideCardNameMonster() {
+            Array enumvalues = Enum.GetValues(typeof(MonsterCardNames));
+            Random random = new();
+            MonsterCardNames monstercardname = (MonsterCardNames)enumvalues.GetValue(random.Next(enumvalues.Length));
+            return monstercardname;
+        }
+
+        public SpellCardNames DecideCardNameSpell() {
+            Array enumvalues = Enum.GetValues(typeof(SpellCardNames));
+            Random random = new();
+            SpellCardNames spellcardname = (SpellCardNames)enumvalues.GetValue(random.Next(enumvalues.Length));
+            return spellcardname;
         }
      
 
         public Card GenerateCard()
         {
-            ElementType elementtype = DecideElementType();
             if (DecideCardType() == CardType.monstercard) {
-                SpeciesType speciestype = DecideSpeciesType();
-                string cardname = DecideCardNameMonster(elementtype, speciestype);
-                Card card = new MonsterCard(DecideDamage(), cardname, elementtype, speciestype);
+                MonsterCardNames cardname = DecideCardNameMonster();       
+                Card card = new MonsterCard(DecideDamage(), cardname.ToString(), DecideElementTypeforMonsters(cardname), DecideSpeciesType(cardname));
                 return card;
             } else {
-                Card card = new SpellCard(DecideDamage(), DecideCardNameSpell(elementtype), elementtype);
+                SpellCardNames spellcardname = DecideCardNameSpell();  
+                Card card = new SpellCard(DecideDamage(), spellcardname.ToString(), DecideElementTypeforSpells(spellcardname));
                 return card;
             }
         }

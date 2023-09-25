@@ -9,13 +9,14 @@ namespace MTCGNew.Interfaces {
     internal interface IDecide {
         public int DecideDamage();
 
-        public string DecideCardNameMonster(ElementType elementtype, SpeciesType speciestype);
-        public string DecideCardNameSpell(ElementType elementtype);
+        public MonsterCardNames DecideCardNameMonster();
+        public SpellCardNames DecideCardNameSpell();
 
-        public ElementType DecideElementType();
+        public ElementType DecideElementTypeforSpells(SpellCardNames spellcardname);
+        public ElementType DecideElementTypeforMonsters(MonsterCardNames monstercardname);
+        public SpeciesType DecideSpeciesType(MonsterCardNames monstercardname);
 
         public CardType DecideCardType();
 
-        public SpeciesType DecideSpeciesType();
     }
 }

@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MTCGNew.Enums {
-    enum SpeciesType {
-        Goblin = 1, Dragon, Wizzard, Ork, Knight, Kraken, Elve
+    enum SpellCardNames{
+        WaterSpell = 1,
+        FireSpell,
+        RegularSpell
     }
 }

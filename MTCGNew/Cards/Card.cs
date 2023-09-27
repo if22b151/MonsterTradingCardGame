@@ -18,7 +18,6 @@ namespace MTCGNew.Cards {
 
         public string Cardname {
             get { return _cardname; }
-            set { _cardname = value; }
         }
 
         public ElementType Elementtype { get; private set; }

@@ -5,7 +5,9 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTCGNew", "MTCGNew\MTCGNew.csproj", "{15495ABB-F973-480C-BFAA-7362604D00F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCTGServer", "Server\MCTGServer.csproj", "{5DA0A56F-CBB0-449F-8EF6-527462C95DA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCTGServer", "Server\MCTGServer.csproj", "{5DA0A56F-CBB0-449F-8EF6-527462C95DA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCTGNewTest", "MCTGNewTest\MCTGNewTest.csproj", "{DB9D9A49-C683-4501-BCBA-5464EDB0E598}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{5DA0A56F-CBB0-449F-8EF6-527462C95DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DA0A56F-CBB0-449F-8EF6-527462C95DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DA0A56F-CBB0-449F-8EF6-527462C95DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB9D9A49-C683-4501-BCBA-5464EDB0E598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB9D9A49-C683-4501-BCBA-5464EDB0E598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB9D9A49-C683-4501-BCBA-5464EDB0E598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB9D9A49-C683-4501-BCBA-5464EDB0E598}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

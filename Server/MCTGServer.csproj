@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MTCGNew\MTCGNew.csproj" />
-  </ItemGroup>
-
 </Project>

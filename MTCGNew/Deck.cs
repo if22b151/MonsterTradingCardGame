@@ -1,5 +1,8 @@
-﻿namespace MTCGNew {
-    internal class Deck {
+﻿using MTCGNew.Cards;
 
+namespace MTCGNew {
+    internal class Deckcards {
+
+        public List<Card> Deck { get; set; } = new List<Card>();
     }
 }

@@ -1,5 +1,7 @@
-﻿namespace MCTGServer {
-    internal class HTTPResponder {
+﻿using System.Net;
+
+namespace MCTGServer {
+    public class HTTPResponder {
 
         private StreamWriter _writer;
 
@@ -24,13 +26,13 @@
             writerAlsoToConsole.WriteLine($"HTTP/1.1 {ReturnCode} {ReturnText}");     // first line in HTTP-Response contains the HTTP-Version and the status code
             
             if(Content != null) {
-                Headers["Content-Length"] = Content.ToString();
+                Headers["Content-Length"] = Content.Length.ToString();
 
             }
 
             foreach(var header in Headers) {
 
-                writerAlsoToConsole.WriteLine($"{header.Key}; {header.Value}");     // the HTTP-headers (in HTTP after the first line, until the empy line)
+                writerAlsoToConsole.WriteLine($"{header.Key}: {header.Value}");     // the HTTP-headers (in HTTP after the first line, until the empy line)
 
             }
             writerAlsoToConsole.WriteLine();

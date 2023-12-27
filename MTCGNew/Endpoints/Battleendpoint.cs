@@ -1,0 +1,150 @@
+﻿using MCTGServer;
+using MTCGNew.Models;
+using MTCGNew.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace MTCGNew.Endpoints {
+    internal class Battleendpoint : IHTTPEndpoint {
+
+        public bool HandleRequest(RequestParser request, HTTPResponder responder) {
+            if(request.Method == HttpMethods.GET) {
+                if (request.Path[1] == "stats") {
+                    GetStats(request, responder);
+                    return true;
+                }
+                if (request.Path[1] == "scoreboard") {
+                    GetScoreboard(request, responder);
+                    return true;
+                }
+            }
+            if(request.Method == HttpMethods.POST) {
+                    BattleLogin(request, responder);
+                    return true;
+                }
+            
+            return false;
+        }
+
+        private void BattleLogin(RequestParser request, HTTPResponder responder) {
+            if (!request.Headers.ContainsKey("Authorization")) {
+                responder.ReturnCode = 401;
+                responder.ReturnText = "Unauthorized";
+                responder.Content = "Access token is missing or invalid";
+                return;
+            }
+
+            string inputString = request.Headers["Authorization"];
+            string username = SessionHandling.GetUsername(inputString);
+            int index = request.Headers["Authorization"].IndexOf(" ");
+            string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
+            if (SessionHandling.CheckSession(username) == false) {
+                responder.ReturnCode = 401;
+                responder.ReturnText = "Unauthorized";
+                responder.Content = "Not logged in!";
+                return;
+            }
+            string usersessiontoken = SessionHandling.Sessions[username];
+            if(rqauthtoken == usersessiontoken) {
+
+            }
+            responder.ReturnCode = 401;
+            responder.ReturnText = "Unauthorized";
+            responder.Content = "Access token is missing or invalid";
+            return;
+        }
+
+
+        private void GetScoreboard(RequestParser request, HTTPResponder responder) {
+            if(!request.Headers.ContainsKey("Authorization")) {
+                responder.ReturnCode = 401;
+                responder.ReturnText = "Unauthorized";
+                responder.Content = "Access token is missing or invalid";
+                return;
+            }
+
+            string inputString = request.Headers["Authorization"];
+            string username = SessionHandling.GetUsername(inputString);
+            int index = request.Headers["Authorization"].IndexOf(" ");
+            string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
+            if (SessionHandling.CheckSession(username) == false) {
+                responder.ReturnCode = 401;
+                responder.ReturnText = "Unauthorized";
+                responder.Content = "Not logged in!";
+                return;
+            }
+            string usersessiontoken = SessionHandling.Sessions[username];
+            if(rqauthtoken == usersessiontoken) {
+                try {
+                    Battlerepository battlerepository = new Battlerepository();
+                    List<UserStats> scoreboard = battlerepository.GetScoreboard();
+                    responder.ReturnCode = 200;
+                    responder.ReturnText = "OK";
+                    responder.Content = JsonSerializer.Serialize(scoreboard);
+                    responder.Headers.Add("Content-Type", "application/json");
+                    return;
+                }
+                catch(Exception e) {
+                    responder.ReturnCode = 400;
+                    responder.ReturnText = "Bad Request";
+                    responder.Content = e.Message;
+                    return;
+                }
+            }
+            responder.ReturnCode = 401;
+            responder.ReturnText = "Unauthorized";
+            responder.Content = "Access token is missing or invalid";
+            return;
+        }
+
+        private void GetStats(RequestParser request, HTTPResponder responder) {
+            if (!request.Headers.ContainsKey("Authorization")) {
+                responder.ReturnCode = 401;
+                responder.ReturnText = "Unauthorized";
+                responder.Content = "Access token is missing or invalid";
+                return;
+            }
+
+            string inputString = request.Headers["Authorization"];
+            string username = SessionHandling.GetUsername(inputString);
+            int index = request.Headers["Authorization"].IndexOf(" ");
+            string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
+            if (SessionHandling.CheckSession(username) == false) {
+                responder.ReturnCode = 401;
+                responder.ReturnText = "Unauthorized";
+                responder.Content = "Not logged in!";
+                return;
+            }
+            string usersessiontoken = SessionHandling.Sessions[username];
+            if(rqauthtoken == usersessiontoken) {
+                try {
+                    Battlerepository battlerepository = new Battlerepository();
+                    UserStats? stats = battlerepository.GetStats(username);
+                    responder.ReturnCode = 200;
+                    responder.ReturnText = "OK";
+                    responder.Content = JsonSerializer.Serialize(stats);
+                    responder.Headers.Add("Content-Type", "application/json");
+                    return;
+                }
+                catch(Exception e) {
+                    responder.ReturnCode = 400;
+                    responder.ReturnText = "Bad Request";
+                    responder.Content = e.Message;
+                    return;
+                }
+            }
+            responder.ReturnCode = 401;
+            responder.ReturnText = "Unauthorized";
+            responder.Content = "Access token is missing or invalid";
+            return;
+
+        }
+
+
+
+    }
+}

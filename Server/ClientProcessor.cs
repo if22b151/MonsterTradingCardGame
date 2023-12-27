@@ -8,18 +8,32 @@ using System.Threading.Tasks;
 namespace MCTGServer {
     internal class ClientProcessor {
 
-        public void ClientProcessing(TcpClient clientSocket) {
-            using var writer = new StreamWriter(clientSocket.GetStream()) { AutoFlush = true };
-            using var reader = new StreamReader(clientSocket.GetStream());
+        private readonly Server _httpserver;
 
+        private readonly TcpClient _clientSocket;
 
+        public ClientProcessor(TcpClient client, Server httpServer)
+        {
+            _clientSocket = client;
+            _httpserver = httpServer;
+        }
 
-            RequestParser parser = new(reader);
-            parser.RequestParsing();
+        public void ClientProcessing() {
+            
+            using var writer = new StreamWriter(_clientSocket.GetStream()) { AutoFlush = true };
+            using var reader = new StreamReader(_clientSocket.GetStream());
 
-            //TODO: Requesthandling
+            RequestParser rq = new(reader);
+            rq.RequestParsing();
 
             HTTPResponder responder = new(writer);
+            Console.WriteLine($"Path: {rq.Path[1]}");
+            var endpoint = _httpserver.Endpoints.ContainsKey(rq.Path[1]) ? _httpserver.Endpoints[rq.Path[1]] : null;
+            if (endpoint == null || !endpoint.HandleRequest(rq, responder)) {
+                responder.ReturnCode = 404;
+                responder.ReturnText = "Not Found";
+            }
+
             responder.SendResponse();
         }
     }

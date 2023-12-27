@@ -5,9 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MCTGServer {
-    internal class Program {
-        static void Main(string[] args) {
-          
-        }
+    public interface IHTTPEndpoint {
+        public bool HandleRequest(RequestParser request, HTTPResponder response);
     }
 }

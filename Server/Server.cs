@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,8 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MCTGServer {
-    internal class Server {
+    public class Server {
         private readonly TcpListener _listener;
+
+        public Dictionary<string, IHTTPEndpoint> Endpoints { get; set; } = new();
 
         public Server()
         {
@@ -25,14 +28,15 @@ namespace MCTGServer {
         private void StartServerLoop() {
             while (true) {
                  var clientSocket = _listener.AcceptTcpClient();
-                ClientProcessor clientprocessor = new ClientProcessor();
-                clientprocessor.ClientProcessing(clientSocket);
+                ClientProcessor clientprocessor = new ClientProcessor(clientSocket, this);
+                ThreadPool.QueueUserWorkItem(c => clientprocessor.ClientProcessing());
             }
 
         }
 
-       
-
+        public void AddEndpoint(string path, IHTTPEndpoint endpoint) {
+            Endpoints.Add(path, endpoint);
+        }
         
     }
 }

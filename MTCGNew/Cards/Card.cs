@@ -3,38 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MTCGNew.Cards {
-    internal abstract class Card {
+    internal class Card {
         //variables
-        protected readonly int _damage;
-        protected string _cardname;
 
         //properties
-        public int Damage {
-            get { return _damage; }
+        public float Damage { get; set; }
+        public string Name { get; set; } = "";
+        public string Id { get; set; } = "";
+
+        // public ElementType? Elementtype { get; private set; }
+
+        /*  public virtual void PrintStats() {
+              Console.WriteLine($"Cardname: {_cardname}, Damage: {_damage}, Elementtype: {Elementtype}");
+          }*/
+        public Card() {
+           
         }
-
-        public string Cardname {
-            get { return _cardname; }
-        }
-
-        public ElementType Elementtype { get; private set; }
-
-        public virtual void PrintStats() {
-            Console.WriteLine($"Cardname: {_cardname}, Damage: {_damage}, Elementtype: {Elementtype}");
-        }
-
-        //Constructor
-        public Card(int damage, string cardname, ElementType element)
-        {
-            _damage = damage;
-            _cardname = cardname;
-            Elementtype = element;
-            
-        }
-
 
     }
 }

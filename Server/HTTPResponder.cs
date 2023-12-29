@@ -30,11 +30,6 @@ namespace MCTGServer {
 
             }
 
-            foreach(var header in Headers) {
-
-                writerAlsoToConsole.WriteLine($"{header.Key}: {header.Value}");     // the HTTP-headers (in HTTP after the first line, until the empy line)
-
-            }
             writerAlsoToConsole.WriteLine();
             if(Content != null) {
                  writerAlsoToConsole.WriteLine($"{Content}");    // the HTTP-content (here we just return a minimalistic HTML Hello-World)

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using MTCGNew.Cards;
+using MTCGNew.Models;
 using Npgsql;
 
 namespace MTCGNew.Repositories {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MTCGNew.Enums {
     
-    enum CardType {
+    public enum CardType {
         monstercard = 1, spellcard
     }
 }

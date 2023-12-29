@@ -19,7 +19,7 @@ namespace MTCGNew {
 
             if(request.Method == HttpMethods.GET) {
                 if(request.Path.Count() == 2) {
-                    GetUsers(request, response);
+                    //GetUsers(request, response);
                     return true;
                 } else if(request.Path.Count() == 3) {
                     GetUser(request, response);
@@ -39,7 +39,7 @@ namespace MTCGNew {
             return false;
         }
 
-        public void GetUsers(RequestParser request, HTTPResponder response) {
+        /*public void GetUsers(RequestParser request, HTTPResponder response) {
             UserRepositories userRepository = new UserRepositories();
             var userlist = userRepository.GetUsers();
             if(userlist.Count == 0) {
@@ -51,7 +51,7 @@ namespace MTCGNew {
 
             response.Content = JsonSerializer.Serialize(userlist);
             response.Headers.Add("Content-Type", "application/json");
-        }
+        }*/
 
         public void GetUser(RequestParser request, HTTPResponder responder) {
             if (request.Headers["Authorization"] == null) {
@@ -150,7 +150,7 @@ namespace MTCGNew {
         public void CreateUser(RequestParser request, HTTPResponder response) {
             UserRepositories userRepository = new UserRepositories();
             try {
-                var user = JsonSerializer.Deserialize<Users>(request.Content ?? "");
+                var user = JsonSerializer.Deserialize<Credentials>(request.Content ?? "");
                 if (user is null) {
                     throw new ArgumentNullException("User was not sent with request!");
                 }
@@ -159,24 +159,28 @@ namespace MTCGNew {
                 response.ReturnCode = 201;
                 response.ReturnText = "OK";
                 response.Content = "User successfully created";
+                return;
             }
 
             catch(ArgumentNullException e) {
                 response.ReturnCode = 400;
                 response.ReturnText = "Bad Request";
                 response.Content = e.Message;
+                return;
             }
 
             catch(SqlAlreadyFilledException e) {
                 response.ReturnCode = 409;
                 response.ReturnText = "Conflict";
                 response.Content = e.Message;
+                return;
             }
 
             catch(Exception) {
                 response.ReturnCode = 400;
                 response.ReturnText = "Bad Request";
                 response.Content = "User couldnt be created";
+                return;
             }
         }
     }

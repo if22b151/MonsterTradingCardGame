@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MTCGNew.Models;
 
 namespace MTCGNew.Endpoints {
     internal class Stackendpoint : IHTTPEndpoint {
@@ -39,7 +40,7 @@ namespace MTCGNew.Endpoints {
             if(rqauthtoken == usersessiontoken) {
                 Stackrepository stackrepository = new Stackrepository();
                 try {
-                    StackCards? stack = stackrepository.GetCards(username);
+                    Stackcards? stack = stackrepository.GetCards(username);
                     if(stack == null) {
                         responder.ReturnCode = 204;
                         responder.ReturnText = "No Content";

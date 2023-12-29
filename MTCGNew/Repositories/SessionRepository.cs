@@ -12,7 +12,7 @@ namespace MTCGNew.Repositories {
 
         public SessionRepository() : base() { }
 
-        public string? Login(Users user) {
+        public string? Login(Credentials user) {
             string comparison_username = user.Username;
             string comparison_password = user.Password;
             using IDbConnection _dbconnection = new Npgsql.NpgsqlConnection(_connection);

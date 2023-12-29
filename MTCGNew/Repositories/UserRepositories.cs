@@ -15,8 +15,8 @@ namespace MTCGNew.Repositories {
 
         public UserRepositories() : base() { }
 
-        internal List<Users> GetUsers() {
-            List<Users> users = new List<Users>();
+        /*internal List<Credentials> GetUsers() {
+            List<Credentials> users = new List<Credentials>();
             lock(this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
                 using IDbCommand _dbcommand = _dbconnection.CreateCommand();
@@ -25,7 +25,7 @@ namespace MTCGNew.Repositories {
                 _dbcommand.CommandText = "SELECT * FROM users";
                 var reader = _dbcommand.ExecuteReader();
                 while (reader.Read()) {
-                    users.Add(new Users() {
+                    users.Add(new Credentials() {
                         Id = reader.GetInt32(reader.GetOrdinal("user_id")),
                         Username = reader.GetString(reader.GetOrdinal("username")),
                         Password = reader.GetString(reader.GetOrdinal("password")),
@@ -43,25 +43,18 @@ namespace MTCGNew.Repositories {
                 return users;
             }
 
-        }
+        }*/
 
-        internal Users? GetUser(string username) {
+        internal EditableUserData? GetUser(string username) {
             lock(this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
                 using IDbCommand _dbcommand = _dbconnection.CreateCommand();
                 _dbconnection.Open();
-                _dbcommand.CommandText = "SELECT * FROM users WHERE username = @username";
+                _dbcommand.CommandText = "SELECT name, bio, image FROM users WHERE username = @username";
                 AddParameter(_dbcommand, "@username", username, DbType.String);
                 var reader = _dbcommand.ExecuteReader();
                 if (reader.Read()) {
-                    return new Users() {
-                        Id = reader.GetInt32(reader.GetOrdinal("user_id")),
-                        Username = reader.GetString(reader.GetOrdinal("username")),
-                        Password = reader.GetString(reader.GetOrdinal("password")),
-                        Wins = reader.GetInt32(reader.GetOrdinal("wins")),
-                        Losses = reader.GetInt32(reader.GetOrdinal("losses")),
-                        Elo = reader.GetInt32(reader.GetOrdinal("elo")),
-                        Coins = reader.GetInt32(reader.GetOrdinal("coins")),
+                    return new EditableUserData() {
                         Bio = reader.IsDBNull(reader.GetOrdinal("bio")) ? null : reader.GetString(reader.GetOrdinal("bio")),
                         Image = reader.IsDBNull(reader.GetOrdinal("image")) ? null : reader.GetString(reader.GetOrdinal("image")),
                         Name = reader.IsDBNull(reader.GetOrdinal("name")) ? null : reader.GetString(reader.GetOrdinal("name"))
@@ -98,7 +91,7 @@ namespace MTCGNew.Repositories {
 
         }
         
-        internal void CreateUser(Users user) {
+        internal void CreateUser(Credentials user) {
             lock (this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
                 using IDbCommand _dbcommand = _dbconnection.CreateCommand();
@@ -109,13 +102,9 @@ namespace MTCGNew.Repositories {
                 if (db_username != null) {
                     throw new SqlAlreadyFilledException("User with same username already registered");
                 }
-                _dbcommand.CommandText = "INSERT INTO users (username, password, wins, losses, elo, coins) VALUES (@username, @password, @wins, @losses, @elo, @coins)";
+                _dbcommand.CommandText = "INSERT INTO users (username, password) VALUES (@username, @password)";
                 AddParameter(_dbcommand, "@username", user.Username, DbType.String);
                 AddParameter(_dbcommand, "@password", user.Password, DbType.String);
-                AddParameter(_dbcommand, "@wins", user.Wins, DbType.Int32);
-                AddParameter(_dbcommand, "@losses", user.Losses, DbType.Int32);
-                AddParameter(_dbcommand, "@elo", user.Elo, DbType.Int32);
-                AddParameter(_dbcommand, "@coins", user.Coins, DbType.Int32);
                 _dbcommand.ExecuteNonQuery();
 
             }

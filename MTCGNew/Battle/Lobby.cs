@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MTCGNew.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,11 @@ namespace MTCGNew.Battle {
 
         public static void AddtoLobby(Player player) {
             players.Enqueue(player);
+            lock(players) {
+                if(players.Count >= 2) {
+                     _ = new Battle(players.Dequeue(), players.Dequeue());
+                }
+            }
         }
 
     }

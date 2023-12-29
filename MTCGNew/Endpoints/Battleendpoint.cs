@@ -1,4 +1,6 @@
 ﻿using MCTGServer;
+using MTCGNew.Battle;
+using MTCGNew.Cards;
 using MTCGNew.Models;
 using MTCGNew.Repositories;
 using System;
@@ -50,6 +52,37 @@ namespace MTCGNew.Endpoints {
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if(rqauthtoken == usersessiontoken) {
+                try {
+                    Deckrepository deckrepository = new Deckrepository();
+                    Deckcards? deck = deckrepository.GetCards(username);
+                    if(deck == null) {
+                        responder.ReturnCode = 400;
+                        responder.ReturnText = "Bad Request";
+                        responder.Content = "Deck is invalid!";
+                        return;
+                    }
+
+                    foreach(Card card in deck.Deck) {
+                        card.SetCardandElementtype();
+                    }
+
+                    Battlerepository battlerepository = new Battlerepository();
+                    Player? player = battlerepository.BattlePrep(deck, username);
+                    if(player == null) {
+                        responder.ReturnCode = 400;
+                        responder.ReturnText = "Bad Request";
+                        responder.Content = "Player is invalid!";
+                        return;
+                    }
+                    player.Name = username;
+                    Lobby.AddtoLobby(player);
+                }
+                catch(Exception e) {
+                    responder.ReturnCode = 400;
+                    responder.ReturnText = "Bad Request";
+                    responder.Content = e.Message;
+                    return;
+                }
 
             }
             responder.ReturnCode = 401;

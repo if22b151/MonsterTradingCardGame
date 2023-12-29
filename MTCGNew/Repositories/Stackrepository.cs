@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MTCGNew.Cards;
+using MTCGNew.Models;
 using Npgsql;
+
 
 namespace MTCGNew.Repositories {
     internal class Stackrepository : DBConnection {
 
-        public StackCards? GetCards(string username) {
+        public Stackcards? GetCards(string username) {
             lock(this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
                 using IDbCommand _dbcommand = _dbconnection.CreateCommand();
@@ -18,7 +20,7 @@ namespace MTCGNew.Repositories {
                 _dbcommand.CommandText = "SELECT cards.card_id, cards.name, cards.damage FROM cards INNER JOIN stack ON cards.card_id = stack.fk_card_id INNER JOIN users ON users.user_id = stack.fk_user_id WHERE users.username = @username";
                 AddParameter(_dbcommand, "@username", username, DbType.String);
                 var reader = _dbcommand.ExecuteReader();
-                StackCards stack = new StackCards();
+                Stackcards stack = new Stackcards();
                 if(reader.Read()) {
                     while (reader.Read()) {
                         stack.Stack.Add(new Card() {

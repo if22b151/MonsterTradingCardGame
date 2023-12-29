@@ -23,7 +23,7 @@ namespace MTCGNew.Endpoints {
 
         private void Login(RequestParser request, HTTPResponder response) {
             SessionRepository sessionRepository = new SessionRepository();
-            var user = JsonSerializer.Deserialize<Users>(request.Content ?? "");
+            var user = JsonSerializer.Deserialize<Credentials>(request.Content ?? "");
             if (user is null) {
                 response.ReturnCode = 400;
                 response.ReturnText = "Bad Request";

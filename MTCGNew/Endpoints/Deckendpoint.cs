@@ -2,6 +2,7 @@
 using MTCGNew.Cards;
 using MTCGNew.Repositories;
 using System.Text.Json;
+using MTCGNew.Models;
 
 namespace MTCGNew.Endpoints
 {

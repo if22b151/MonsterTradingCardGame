@@ -94,6 +94,17 @@ namespace MTCGNew.Repositories {
   
         }
 
+        public void DeleteDeck(string username) {
+                using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
+                using IDbCommand _dbcommand = _dbconnection.CreateCommand();
+                _dbconnection.Open();
+                _dbcommand.CommandText = "DELETE FROM deck WHERE fk_user_id = (SELECT user_id FROM users WHERE username = @username)";
+                AddParameter(_dbcommand, "@username", username, DbType.String);
+                _dbcommand.ExecuteNonQuery();
+                _dbcommand.Parameters.Clear();
+            
+        }
+
         private void AddParameter(IDbCommand dbcommand, string parametername, string value, DbType type) {
             IDbDataParameter parameter = dbcommand.CreateParameter();
             parameter.ParameterName = parametername;

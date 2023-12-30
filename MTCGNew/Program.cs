@@ -19,6 +19,7 @@ namespace MTCGNew {
             server.AddEndpoint("stats", new Battleendpoint());
             server.AddEndpoint("scoreboard", new Battleendpoint());
             server.AddEndpoint("battles", new Battleendpoint());
+            server.AddEndpoint("tradings", new Tradingendpoint());
             server.StartServer();
         }
     }

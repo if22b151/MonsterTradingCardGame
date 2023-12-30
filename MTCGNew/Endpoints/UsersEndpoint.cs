@@ -13,7 +13,7 @@ using MTCGNew.Models;
 using System.Data.SqlTypes;
 
 namespace MTCGNew {
-    internal class UsersEndpoint : IHTTPEndpoint {
+    public class UsersEndpoint : IHTTPEndpoint {
         
         public bool HandleRequest(RequestParser request, HTTPResponder response) {
 
@@ -72,7 +72,7 @@ namespace MTCGNew {
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if(rqauthtoken == usersessiontoken) {
-                UserRepositories userRepository = new UserRepositories();
+                UserRepository userRepository = new UserRepository();
                 var user = userRepository.GetUser(username);
                 if (user is null) {
                     responder.ReturnCode = 404;
@@ -110,7 +110,7 @@ namespace MTCGNew {
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if (rqauthtoken == usersessiontoken) {
-                UserRepositories userRepository = new UserRepositories();
+                UserRepository userRepository = new UserRepository();
                 var userdata = JsonSerializer.Deserialize<EditableUserData>(request.Content ?? "");
                 if (userdata is null) {
                     responder.ReturnCode = 400;
@@ -148,7 +148,7 @@ namespace MTCGNew {
         
 
         public void CreateUser(RequestParser request, HTTPResponder response) {
-            UserRepositories userRepository = new UserRepositories();
+            UserRepository userRepository = new UserRepository();
             try {
                 var user = JsonSerializer.Deserialize<Credentials>(request.Content ?? "");
                 if (user is null) {

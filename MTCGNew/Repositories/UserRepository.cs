@@ -11,9 +11,9 @@ using MTCGNew.Models;
 using Npgsql;
 
 namespace MTCGNew.Repositories {
-    internal class UserRepositories : DBConnection {
+    internal class UserRepository : DBConnection {
 
-        public UserRepositories() : base() { }
+        public UserRepository() : base() { }
 
         /*internal List<Credentials> GetUsers() {
             List<Credentials> users = new List<Credentials>();
@@ -46,7 +46,7 @@ namespace MTCGNew.Repositories {
         }*/
 
         internal EditableUserData? GetUser(string username) {
-            lock(this) {
+            lock (this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
                 using IDbCommand _dbcommand = _dbconnection.CreateCommand();
                 _dbconnection.Open();
@@ -66,7 +66,7 @@ namespace MTCGNew.Repositories {
         }
 
         internal void EditUser(EditableUserData userdata, string username) {
-            lock(this) {
+            lock (this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
                 using IDbCommand _dbcommand = _dbconnection.CreateCommand();
                 _dbconnection.Open();
@@ -80,9 +80,11 @@ namespace MTCGNew.Repositories {
 
 
                 _dbcommand.CommandText = "UPDATE users SET bio = @bio, image = @image, name = @name WHERE username = @username";
+#pragma warning disable CS8604 // Possible null reference argument.
                 AddParameter(_dbcommand, "@bio", value: userdata.Bio, DbType.String);
                 AddParameter(_dbcommand, "@image", value: userdata.Image, DbType.String);
                 AddParameter(_dbcommand, "@name", value: userdata.Name, DbType.String);
+#pragma warning restore CS8604 // Possible null reference argument.
                 AddParameter(_dbcommand, "@username", username, DbType.String);
                 _dbcommand.ExecuteNonQuery();
 
@@ -90,7 +92,7 @@ namespace MTCGNew.Repositories {
             }
 
         }
-        
+
         internal void CreateUser(Credentials user) {
             lock (this) {
                 using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
@@ -108,7 +110,35 @@ namespace MTCGNew.Repositories {
                 _dbcommand.ExecuteNonQuery();
 
             }
-           
+
+        }
+
+        public void UpdateUserStats(Player player1, Player player2) {
+            if (player1.HasWon) {
+                using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
+                using IDbCommand _dbcommand = _dbconnection.CreateCommand();
+                _dbconnection.Open();
+                _dbcommand.CommandText = "UPDATE users SET wins = wins + 1, elo = elo + 5 WHERE username = @username";
+                AddParameter(_dbcommand, "@username", player1.Name, DbType.String);
+                _dbcommand.ExecuteNonQuery();
+                _dbcommand.Parameters.Clear();
+                _dbcommand.CommandText = "UPDATE users SET losses = losses + 1, elo = elo - 3 WHERE username = @username";
+                AddParameter(_dbcommand, "@username", player2.Name, DbType.String);
+                _dbcommand.ExecuteNonQuery();
+                _dbcommand.Parameters.Clear();
+            } else if (player2.HasWon) {
+                using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
+                using IDbCommand _dbcommand = _dbconnection.CreateCommand();
+                _dbconnection.Open();
+                _dbcommand.CommandText = "UPDATE users SET wins = wins + 1, elo = elo + 5 WHERE username = @username";
+                AddParameter(_dbcommand, "@username", player2.Name, DbType.String);
+                _dbcommand.ExecuteNonQuery();
+                _dbcommand.Parameters.Clear();
+                _dbcommand.CommandText = "UPDATE users SET losses = losses + 1, elo = elo - 3 WHERE username = @username";
+                AddParameter(_dbcommand, "@username", player1.Name, DbType.String);
+                _dbcommand.ExecuteNonQuery();
+                _dbcommand.Parameters.Clear();
+            } 
         }
 
         private void AddParameter(IDbCommand command, string name, object value, DbType dbtype) {
@@ -118,6 +148,6 @@ namespace MTCGNew.Repositories {
             parameter.Value = value;
             command.Parameters.Add(parameter);
         }
- 
+
     }
 }

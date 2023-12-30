@@ -37,6 +37,18 @@ namespace MTCGNew.Repositories {
             }
         }
 
+        public void ChangeOwnerofCard(string username, Card card) {
+            
+            using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
+            using IDbCommand _dbcommand = _dbconnection.CreateCommand();
+            _dbconnection.Open();
+            _dbcommand.CommandText = "UPDATE stack SET fk_user_id = (SELECT user_id FROM users WHERE username = @username) WHERE fk_card_id = @cardid";
+            AddParameter(_dbcommand, "@username", username, DbType.String);
+            AddParameter(_dbcommand, "@cardid", card.Id, DbType.String);
+            _dbcommand.ExecuteNonQuery();
+            
+        }
+
         private void AddParameter(IDbCommand dbcommand, string parametername, string value, DbType type) {
             IDbDataParameter parameter = dbcommand.CreateParameter();
             parameter.ParameterName = parametername;

@@ -30,6 +30,7 @@ namespace MTCGNew.Repositories {
                     Losses = reader.GetInt32(reader.GetOrdinal("losses"))
                 });
             }
+            reader.Close();
             return scoreboard;
         }
         public UserStats? GetStats(string username) {
@@ -47,6 +48,7 @@ namespace MTCGNew.Repositories {
                     Losses = reader.GetInt32(reader.GetOrdinal("losses"))
                 };
             }
+            reader.Close();
           
             return null;
 
@@ -68,7 +70,10 @@ namespace MTCGNew.Repositories {
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Damage = (float)reader.GetDouble(reader.GetOrdinal("damage"))
                         });
+
                     }
+                    reader.Close();
+
 
                 }
                 return player;

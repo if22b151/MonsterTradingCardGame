@@ -15,7 +15,7 @@ namespace MTCGNew.Cards {
         public string Name { get; set; } = "";
         public string Id { get; set; } = "";
 
-        public ElementType? Elementtype { get; private set; }
+        public ElementType? Elementtype { get; set; }
 
         public CardType? Cardtype { get; set; }
 

@@ -30,26 +30,20 @@ namespace MTCGNew.Endpoints {
 
         private void CreatePackage(RequestParser request, HTTPResponder responder) {
             if (request.Headers["Authorization"] == null) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
 
             PackageRepository packagerepo = new PackageRepository();
             var package = JsonSerializer.Deserialize<List<Card>>(request.Content ?? "");
             if (package == null) {
-                responder.ReturnCode = 400;
-                responder.ReturnText = "Bad Request";
-                responder.Content = "Package was not sent with request!";
+                responder.SetResponse(400, "Bad Request", "Package was not sent with request!");
                 return;
             }
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession("admin") == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string adminsessiontoken = SessionHandling.Sessions["admin"];
@@ -62,34 +56,25 @@ namespace MTCGNew.Endpoints {
                         
                     }
                     packagerepo.CreatePackage(package);
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = "Package and cards successfully created";
+                    responder.SetResponse(201, "Created", "Package and cards successfully created");
                     return;
                 } 
                 catch(SqlAlreadyFilledException e) {
-                    responder.ReturnCode = 409;
-                    responder.ReturnText = "Conflict";
-                    responder.Content = e.Message;
+                    responder.SetResponse(409, "Conflict", e.Message);
                     return;
                 }
 
                 catch(Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
             }
-            responder.ReturnCode = 403;
-            responder.ReturnText = "Forbidden";
-            responder.Content = "Provided user is not admin";
+            responder.SetResponse(403, "Forbidden", "Provided user is not admin");
+            return;
         }
         private void AcquirePackage(RequestParser request, HTTPResponder responder) {
             if (request.Headers["Authorization"] == null) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
             string inputString = request.Headers["Authorization"];
@@ -97,9 +82,7 @@ namespace MTCGNew.Endpoints {
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession("admin") == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
@@ -107,35 +90,26 @@ namespace MTCGNew.Endpoints {
                 try {
                     PackageRepository packagerepo = new PackageRepository();
                     packagerepo.AcquirePackage(username);
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = "A package has been successfully bought";
+                    responder.SetResponse(200, "OK", "Package successfully acquired");
                     return;
                 }
                 catch (SqlNotFilledException e) {
-                    responder.ReturnCode = 404;
-                    responder.ReturnText = "Not Found";
-                    responder.Content = e.Message;
+                    responder.SetResponse(404, "Not Found", e.Message);
                     return;
                 }
 
                 catch(ArgumentException e) {
-                    responder.ReturnCode = 403;
-                    responder.ReturnText = "Forbidden";
-                    responder.Content = e.Message;
+                    responder.SetResponse(403, "Forbidden", e.Message);
                     return;
                 }
                 
                 catch (Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
             }
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
+            return;
         }
     } 
 }

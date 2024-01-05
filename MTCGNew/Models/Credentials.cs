@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MTCGNew.Models {
-    internal class Credentials {
+    public class Credentials {
 
         //Properties
         

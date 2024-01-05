@@ -23,9 +23,7 @@ namespace MTCGNew.Endpoints
 
         private void EditDeck(RequestParser request, HTTPResponder responder) {
             if(!request.Headers.ContainsKey("Authorization")) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
             string inputString = request.Headers["Authorization"];
@@ -33,57 +31,41 @@ namespace MTCGNew.Endpoints
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if(SessionHandling.CheckSession(username) == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if(rqauthtoken == usersessiontoken) {
                 List<string>? deck = JsonSerializer.Deserialize<List<string>>(request.Content ?? "");
                 if(deck == null || deck.Count != 4) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = "The provided deck did not include the required amount of cards";
+                    responder.SetResponse(400, "Bad Request", "The provided deck did not include the required amount of cards");
                     return;
                 }
                 Deckrepository deckrepository = new Deckrepository();
                 try {
                     deckrepository.EditDeck(deck, username);
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = "The deck has been successfully configured";
+                    responder.SetResponse(200, "OK", "The deck has been successfully configured");
                     return;
                 }
 
                 catch(ArgumentException e) {
-                    responder.ReturnCode = 403;
-                    responder.ReturnText = "Forbidden";
-                    responder.Content = e.Message;
+                    responder.SetResponse(403, "Forbidden", e.Message);
                     return;
                 }
 
 
                 catch (Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
 
             }
-
-
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
         }
 
         private void GetDeck(RequestParser request, HTTPResponder responder) {
             if(!request.Headers.ContainsKey("Authorization")) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
             string inputString = request.Headers["Authorization"];
@@ -91,48 +73,33 @@ namespace MTCGNew.Endpoints
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession(username) == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if(rqauthtoken == usersessiontoken) {
                 Deckrepository deckrepository = new Deckrepository();
                 try {
-                    Deckcards? deck = deckrepository.GetCards(username);
-                    if(deck == null) {
-                        responder.ReturnCode = 204;
-                        responder.ReturnText = "No Content";
-                        responder.Content = "The request was fine, but the deck doesn't have any cards";
+                    Deckcards deck = deckrepository.GetCards(username);
+                    if(deck.Deck.Count() == 0) {
+                        responder.SetResponse(204, "No Content", "The request was fine, but the deck doesn't have any cards");
                         return;
                     }
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
                     if (request.QueryParameters.ContainsKey("format") && request.QueryParameters["format"] == "plain") {
-                        responder.Headers.Add("Content-Type", "format/plain");
-                        responder.Content = JsonSerializer.Serialize(deck);
+                        responder.SetResponse(200, "OK", deck.ToString(), "Content-Type", "format/plain");
                     } else {
-                        responder.Content = JsonSerializer.Serialize(deck);
-                        responder.Headers.Add("Content-Type", "application/json");
+                        responder.SetResponse(200, "OK", JsonSerializer.Serialize(deck), "Content-Type", "application/json");
 
                     }
                     return;
                 }
                 catch (Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
             }
-
-
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
             return;
-
 
         }
     }

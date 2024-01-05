@@ -22,7 +22,7 @@ namespace MTCGNew.Repositories {
             using var transaction = _dbconnection.BeginTransaction();
             foreach (Card card in package) {
                 _dbcommand.CommandText = "SELECT card_id FROM cards WHERE card_id = @card_id";
-                AddParameter(card.Id, _dbcommand, "@card_id", DbType.String);
+                AddParameter(_dbcommand, "@card_id", card.Id, DbType.String);
                 var id = _dbcommand.ExecuteScalar();
                 if (id != null) {
                     throw new SqlAlreadyFilledException("At least one card in the packages already exists");
@@ -41,9 +41,9 @@ namespace MTCGNew.Repositories {
 
             foreach(Card card in package) {
                 _dbcommand.CommandText = "INSERT INTO cards (card_id, name, damage) VALUES (@card_id, @name, @damage)";
-                AddParameter(card.Id, _dbcommand, "@card_id", DbType.String);
-                AddParameter(card.Name, _dbcommand, "@name", DbType.String);
-                AddParameter(card.Damage, _dbcommand, "@damage", DbType.Decimal);
+                AddParameter(_dbcommand, "@card_id", card.Id, DbType.String);
+                AddParameter(_dbcommand, "@name", card.Name, DbType.String);
+                AddParameter(_dbcommand, "@damage", card.Damage, DbType.Double);
                 _dbcommand.ExecuteNonQuery();
                 _dbcommand.Parameters.Clear();
             }
@@ -53,12 +53,5 @@ namespace MTCGNew.Repositories {
             
         }
 
-        private static void AddParameter<T>(T cardparameter, IDbCommand _dbcommand, string parametername, DbType type) {
-            IDbDataParameter parameter = _dbcommand.CreateParameter();
-            parameter.ParameterName = parametername;
-            parameter.Value = cardparameter;
-            parameter.DbType = type;
-            _dbcommand.Parameters.Add(parameter);
-        }
     }
 }

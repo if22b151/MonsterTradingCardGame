@@ -18,14 +18,10 @@ namespace MTCGNew {
         public bool HandleRequest(RequestParser request, HTTPResponder response) {
 
             if(request.Method == HttpMethods.GET) {
-                if(request.Path.Count() == 2) {
-                    //GetUsers(request, response);
-                    return true;
-                } else if(request.Path.Count() == 3) {
+               if(request.Path.Count() == 3) {
                     GetUser(request, response);
                     return true;
-                }
-                return true;
+               }
             }
             else if(request.Method == HttpMethods.POST) {
                 CreateUser(request, response);
@@ -39,25 +35,9 @@ namespace MTCGNew {
             return false;
         }
 
-        /*public void GetUsers(RequestParser request, HTTPResponder response) {
-            UserRepositories userRepository = new UserRepositories();
-            var userlist = userRepository.GetUsers();
-            if(userlist.Count == 0) {
-                response.ReturnCode = 404;
-                response.ReturnText = "Not Found";
-                response.Content = "No users";
-                return;
-            }
-
-            response.Content = JsonSerializer.Serialize(userlist);
-            response.Headers.Add("Content-Type", "application/json");
-        }*/
-
         public void GetUser(RequestParser request, HTTPResponder responder) {
             if (request.Headers["Authorization"] == null) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
             string inputString = request.Headers["Authorization"];
@@ -65,9 +45,7 @@ namespace MTCGNew {
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession(username) == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
@@ -75,27 +53,19 @@ namespace MTCGNew {
                 UserRepository userRepository = new UserRepository();
                 var user = userRepository.GetUser(username);
                 if (user is null) {
-                    responder.ReturnCode = 404;
-                    responder.ReturnText = "Not Found";
-                    responder.Content = "User not found";
+                    responder.SetResponse(404, "Not Found", "User not found");
                     return;
                 }
-                responder.ReturnCode = 200;
-                responder.ReturnText = "OK";
-                responder.Content = JsonSerializer.Serialize(user);
-                responder.Headers.Add("Content-Type", "application/json");
+                responder.SetResponse(200, "OK", JsonSerializer.Serialize(user), "Content-Type", "application/json");
                 return;
             }
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
+            return;
         }
 
         public void EditUser(RequestParser request, HTTPResponder responder) {
             if (request.Headers["Authorization"] == null) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");   
                 return;
             }   
             string inputString = request.Headers["Authorization"];
@@ -103,45 +73,33 @@ namespace MTCGNew {
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession(username) == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if (rqauthtoken == usersessiontoken) {
                 UserRepository userRepository = new UserRepository();
-                var userdata = JsonSerializer.Deserialize<EditableUserData>(request.Content ?? "");
+                var userdata = JsonSerializer.Deserialize<UserData>(request.Content ?? "");
                 if (userdata is null) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = "User was not sent with request!";
+                    responder.SetResponse(400, "Bad Request", "User was not sent with request!");
                     return;
                 }
                 try {
                     userRepository.EditUser(userdata, username);
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = "User sucessfully updated.";
+                    responder.SetResponse(200, "OK", "User sucessfully updated.");
                     return;
 
                 } 
                 catch(SqlNotFilledException e) {
-                    responder.ReturnCode = 404;
-                    responder.ReturnText = "Not Found";
-                    responder.Content = e.Message;
+                    responder.SetResponse(404, "Not Found", e.Message);
                     return;
                 }
                 catch(Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
             }
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
             return;
          
         }
@@ -156,30 +114,22 @@ namespace MTCGNew {
                 }
 
                 userRepository.CreateUser(user);
-                response.ReturnCode = 201;
-                response.ReturnText = "OK";
-                response.Content = "User successfully created";
+                response.SetResponse(201, "OK", "User successfully created");
                 return;
             }
 
             catch(ArgumentNullException e) {
-                response.ReturnCode = 400;
-                response.ReturnText = "Bad Request";
-                response.Content = e.Message;
+                response.SetResponse(400, "Bad Request", e.Message);
                 return;
             }
 
             catch(SqlAlreadyFilledException e) {
-                response.ReturnCode = 409;
-                response.ReturnText = "Conflict";
-                response.Content = e.Message;
+                response.SetResponse(409, "Conflict", e.Message);
                 return;
             }
 
             catch(Exception) {
-                response.ReturnCode = 400;
-                response.ReturnText = "Bad Request";
-                response.Content = "User couldnt be created";
+                response.SetResponse(400, "Bad Request", "User couldnt be created");
                 return;
             }
         }

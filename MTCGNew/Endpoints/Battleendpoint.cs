@@ -33,23 +33,17 @@ namespace MTCGNew.Endpoints {
         }
 
         private void BattleLogin(RequestParser request, HTTPResponder responder) {
-            Player? player = new Player();
             lock (this) {
                 if (!request.Headers.ContainsKey("Authorization")) {
-                    responder.ReturnCode = 401;
-                    responder.ReturnText = "Unauthorized";
-                    responder.Content = "Access token is missing or invalid";
+                    responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                     return;
                 }
-
                 string inputString = request.Headers["Authorization"];
                 string username = SessionHandling.GetUsername(inputString);
                 int index = request.Headers["Authorization"].IndexOf(" ");
                 string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
                 if (SessionHandling.CheckSession(username) == false) {
-                    responder.ReturnCode = 401;
-                    responder.ReturnText = "Unauthorized";
-                    responder.Content = "Not logged in!";
+                    responder.SetResponse(401, "Unauthorized", "Not logged in!");
                     return;
                 }
                 string usersessiontoken = SessionHandling.Sessions[username];
@@ -58,58 +52,40 @@ namespace MTCGNew.Endpoints {
                         Deckrepository deckrepository = new Deckrepository();
                         Deckcards? deck = deckrepository.GetCards(username);
                         if (deck == null) {
-                            responder.ReturnCode = 400;
-                            responder.ReturnText = "Bad Request";
-                            responder.Content = "Deck is invalid!";
+                            responder.SetResponse(400, "Bad Request", "Deck is invalid!");
                             return;
                         }
-
-                        foreach (Card card in deck.Deck) {
-                            card.SetCardandElementtype();
-                        }
-
-                        Battlerepository battlerepository = new Battlerepository();
-                        player = battlerepository.BattlePrep(deck, username);
-                        if (player == null) {
-                            responder.ReturnCode = 400;
-                            responder.ReturnText = "Bad Request";
-                            responder.Content = "Player is invalid!";
-                            return;
-                        }
+                        Player player = new Player();
+                        player.Deck = deck.Deck;
                         player.Name = username;
+                        foreach (Card card in player.Deck) {
+                            card.SetCardType();
+                            card.SetElementType();
+                        }
+                        if(Lobby.AddtoLobby(player)) {
+                            BattleLogic battle = new BattleLogic(Lobby.players.Dequeue(), Lobby.players.Dequeue());
+                            string battlelog = battle.BattleLoop();
+                            responder.SetResponse(200, "OK", battlelog);
+                            return;
+                        } else {
+                            responder.SetResponse(202, "Accepted", "You are waiting in the lobby for other opponent!");
+                            return;
+                        }
                     }
                     catch(Exception e) {
-                        responder.ReturnCode = 400;
-                        responder.ReturnText = "Bad Request";
-                        responder.Content = e.Message;
+                        responder.SetResponse(400, "Bad Request", e.Message);
                         return;
                     }
                  }
-
-
-                if(Lobby.AddtoLobby(player)) {
-                    BattleLogic battle = new BattleLogic(Lobby.players.Dequeue(), Lobby.players.Dequeue());
-                    battle.BattleLoop();
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = "The battle has been carried out successfully.";
-                    return;
-                } else {
-                    responder.ReturnCode = 202;
-                    responder.ReturnText = "Accepted";
-                    responder.Content = "The battle has been queued.";
-                    return;
-                }
-
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
+                return;
             }
         }
 
 
         private void GetScoreboard(RequestParser request, HTTPResponder responder) {
             if(!request.Headers.ContainsKey("Authorization")) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
 
@@ -118,9 +94,7 @@ namespace MTCGNew.Endpoints {
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession(username) == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
@@ -128,30 +102,24 @@ namespace MTCGNew.Endpoints {
                 try {
                     Battlerepository battlerepository = new Battlerepository();
                     List<UserStats> scoreboard = battlerepository.GetScoreboard();
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = JsonSerializer.Serialize(scoreboard);
-                    responder.Headers.Add("Content-Type", "application/json");
+                    foreach(UserStats user in scoreboard) {
+                        user.Winrate = user.CalculateWinrate();
+                    }
+                    responder.SetResponse(200, "OK", JsonSerializer.Serialize(scoreboard), "Content-Type", "application/json");
                     return;
                 }
                 catch(Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
             }
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
             return;
         }
 
         private void GetStats(RequestParser request, HTTPResponder responder) {
             if (!request.Headers.ContainsKey("Authorization")) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
 
@@ -160,9 +128,7 @@ namespace MTCGNew.Endpoints {
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession(username) == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
@@ -170,27 +136,23 @@ namespace MTCGNew.Endpoints {
                 try {
                     Battlerepository battlerepository = new Battlerepository();
                     UserStats? stats = battlerepository.GetStats(username);
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = JsonSerializer.Serialize(stats);
-                    responder.Headers.Add("Content-Type", "application/json");
+                    if(stats == null) {
+                        responder.SetResponse(404, "Not Found", "Stats not found!");
+                        return;
+                    }
+                    stats.Winrate = stats.CalculateWinrate();
+                    responder.SetResponse(200, "OK", JsonSerializer.Serialize(stats), "Content-Type", "application/json");
                     return;
                 }
                 catch(Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
             }
-            responder.ReturnCode = 401;
-            responder.ReturnText = "Unauthorized";
-            responder.Content = "Access token is missing or invalid";
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
             return;
 
         }
-
-
 
     }
 }

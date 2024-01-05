@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MTCGNew.Battle {
-    internal class Lobby {
+    public class Lobby {
 
         public static Queue<Player> players = new Queue<Player>();
 

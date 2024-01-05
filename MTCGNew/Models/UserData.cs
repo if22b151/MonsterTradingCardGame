@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MTCGNew.Models {
-    internal class EditableUserData {
+    public class UserData {
         public string? Bio { get; set; }
 
         public string? Image { get; set; }

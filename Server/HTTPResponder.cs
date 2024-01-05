@@ -17,13 +17,26 @@ namespace MCTGServer {
             _writer = writer;
         }
 
+        public void SetResponse(int responsecode, string responsetext, string responsecontent) {
+            ReturnCode = responsecode;
+            ReturnText = responsetext;
+            Content = responsecontent;
+        }
+
+        public void SetResponse(int responsecode, string responsetext, string responsecontent, string headername, string headervalue) {
+            ReturnCode = responsecode;
+            ReturnText = responsetext;
+            Content = responsecontent;
+            Headers[headername] = headervalue;
+        }
+
         public void SendResponse() {
             Console.WriteLine("----------------------------------------");
 
             // ----- 3. Write the HTTP-Response -----
-            var writerAlsoToConsole = new StreamTracer(_writer);  // we use a simple helper-class StreamTracer to write the HTTP-Response to the client and to the console
+            var writerAlsoToConsole = new StreamTracer(_writer);  
 
-            writerAlsoToConsole.WriteLine($"HTTP/1.1 {ReturnCode} {ReturnText}");     // first line in HTTP-Response contains the HTTP-Version and the status code
+            writerAlsoToConsole.WriteLine($"HTTP/1.1 {ReturnCode} {ReturnText}");     
             
             if(Content != null) {
                 Headers["Content-Length"] = Content.Length.ToString();
@@ -32,7 +45,7 @@ namespace MCTGServer {
 
             writerAlsoToConsole.WriteLine();
             if(Content != null) {
-                 writerAlsoToConsole.WriteLine($"{Content}");    // the HTTP-content (here we just return a minimalistic HTML Hello-World)
+                 writerAlsoToConsole.WriteLine($"{Content}");    
 
             }
 

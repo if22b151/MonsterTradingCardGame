@@ -20,9 +20,7 @@ namespace MTCGNew.Endpoints {
 
         private void GetCards(RequestParser request, HTTPResponder responder) {
             if(!request.Headers.ContainsKey("Authorization")) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Access token is missing or invalid";
+                responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
                 return;
             }
 
@@ -31,36 +29,29 @@ namespace MTCGNew.Endpoints {
             int index = request.Headers["Authorization"].IndexOf(" ");
             string rqauthtoken = request.Headers["Authorization"][(index + 1)..];
             if (SessionHandling.CheckSession("admin") == false) {
-                responder.ReturnCode = 401;
-                responder.ReturnText = "Unauthorized";
-                responder.Content = "Not logged in!";
+                responder.SetResponse(401, "Unauthorized", "Not logged in!");
                 return;
             }
             string usersessiontoken = SessionHandling.Sessions[username];
             if(rqauthtoken == usersessiontoken) {
                 Stackrepository stackrepository = new Stackrepository();
                 try {
-                    Stackcards? stack = stackrepository.GetCards(username);
-                    if(stack == null) {
-                        responder.ReturnCode = 204;
-                        responder.ReturnText = "No Content";
-                        responder.Content = "The request was fine, but the user doesn't have any cards";
+                    Stackcards stack = stackrepository.GetCards(username);
+                    if(stack.Stack.Count == 0) {
+                        responder.SetResponse(204, "No Content", "The request was fine, but the user doesn't have any cards");
                         return;
                     }
-                    responder.ReturnCode = 200;
-                    responder.ReturnText = "OK";
-                    responder.Content = JsonSerializer.Serialize(stack);
-                    responder.Headers.Add("Content-Type", "application/json");
+                    responder.SetResponse(200, "OK", JsonSerializer.Serialize(stack), "Content-Type", "application/json");
                     return;
                 }
                 catch (Exception e) {
-                    responder.ReturnCode = 400;
-                    responder.ReturnText = "Bad Request";
-                    responder.Content = e.Message;
+                    responder.SetResponse(400, "Bad Request", e.Message);
                     return;
                 }
 
             }
+            responder.SetResponse(401, "Unauthorized", "Access token is missing or invalid");
+            return;
         }
     }
 }

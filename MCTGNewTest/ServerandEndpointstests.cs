@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MTCGNew;
+using MTCGNew.Models;
 
 namespace MCTGNewTest {
     internal class ServerandEndpointstests {
@@ -41,6 +42,20 @@ namespace MCTGNewTest {
             Assert.That(result, Is.EqualTo(true));
 
         }
+        [Test]
+        public void TestCalculateWinRatio() {
+            //Arrange
+            UserStats user = new UserStats();
+            user.Wins = 2;
+            user.Losses = 1;
+            //Act
+            double result = user.CalculateWinrate();
+            //Assert
+            Assert.That(result, Is.EqualTo(67));
+
+        }
+
+
       
     }
 }

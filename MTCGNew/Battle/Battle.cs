@@ -13,6 +13,7 @@ namespace MTCGNew.Battle {
         private Player player1;
         private Player player2;
         private const int MAXROUNDS = 100;
+        private StringBuilder battlelog = new StringBuilder();
 
         public BattleLogic(Player player1, Player player2) {
             this.player1 = player1;
@@ -20,13 +21,13 @@ namespace MTCGNew.Battle {
         }
 
         private bool CardsareMonstercards(Card card1, Card card2) {
-            if(card1.Cardtype == CardType.monstercard && card2.Cardtype == CardType.monstercard) {
+            if(card1.Cardtype == CardType.monster && card2.Cardtype == CardType.monster) {
                 return true;
             }
             return false;
         }
         private bool CardsareSpellcards(Card currentCard1, Card currentCard2) {
-            if(currentCard1.Cardtype == CardType.spellcard && currentCard2.Cardtype == CardType.spellcard) {
+            if(currentCard1.Cardtype == CardType.spell && currentCard2.Cardtype == CardType.spell) {
                 return true;
             }
             return false;
@@ -40,19 +41,16 @@ namespace MTCGNew.Battle {
 
 
         private void PrintRoundtoConsole() {
-            Console.WriteLine($"{player1.Name}: {player1.CurrentCard.Name} ({player1.CurrentCard.Damage} Damage) vs {player2.Name}: {player1.CurrentCard.Name} ({player1.CurrentCard.Damage} Damage)");
+            battlelog.Append($"{player1.Name}: {player1.CurrentCard.Name} ({player1.CurrentCard.Damage} Damage) vs {player2.Name}: {player2.CurrentCard.Name} ({player2.CurrentCard.Damage} Damage)\n");
         }
 
         private void PrintDamagetoConsole() {
-            Console.WriteLine($"{player1.CurrentCard.Damage} against {player2.CurrentCard.Damage}!");
+            battlelog.Append($"{player1.CurrentCard.Damage} against {player2.CurrentCard.Damage}!\n");
         }
 
-        private void TransferCardtoRoundWinner(Player player, Card currentcard) {
+        private void TransferCardstoBattleWinner(Player player, List<Card> deck) {
             Stackrepository stackrepository = new Stackrepository();
-            stackrepository.ChangeOwnerofCard(player.Name, currentcard);
-
-            Console.WriteLine($"{player.Name} wins the round and gets {currentcard.Name}!");
-                
+            stackrepository.ChangeOwnerofCards(player.Name, deck);                
         }
 
         private void UpdateUserStats() {
@@ -67,46 +65,64 @@ namespace MTCGNew.Battle {
 
         private void MonsterCardFight() {
             PrintRoundtoConsole();
-       
-            if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard)) {
-                Console.WriteLine("Goblin is too afraid of Dragon to attack!\n");
-                Console.WriteLine("Dragon defeats Goblin!\n");
-                TransferCardtoRoundWinner(player2, player1.CurrentCard);
+
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 1) {
+                battlelog.Append("Goblin is too afraid of Dragon\n");
+                battlelog.Append("Dragon defeats Goblin!\n");
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
                 return;
-            } 
-            if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard)) {
-                Console.WriteLine("Wizzard controls Ork! Therefore Ork is not able to damage him!\n");
-                Console.WriteLine("Wizzard defeats Ork!\n");
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
+            }
+
+            if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 2) {
+                battlelog.Append("Goblin is too afraid of Dragon\n");
+                battlelog.Append("Dragon defeats Goblin!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
-            } 
-            if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard)) {
-                Console.WriteLine("FireElves know Dragons since they were little! Therefore they can dodge his attacks!\n");
-                Console.WriteLine("FireElves defeats Dragon!\n");
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
+            }
+
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 3) {
+                battlelog.Append("Wizzard controls Ork! Therefore Ork is not able to damage him!\n");
+                battlelog.Append("Wizzard defeats Ork!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
-            } 
-            
+            }
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 4) {
+                battlelog.Append("Wizzard controls Ork! Therefore Ork is not able to damage him!\n");
+                battlelog.Append("Wizzard defeats Ork!\n");
+                player1.Deck.Remove(player2.CurrentCard);
+                player2.Deck.Add(player2.CurrentCard);
+                return;
+            }
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 5) {
+                battlelog.Append("FireElves know Dragons since they were little! Therefore they can dodge his attacks!\n");
+                battlelog.Append("FireElves defeats Dragon!\n");
+                player2.Deck.Remove(player2.CurrentCard);
+                player1.Deck.Add(player2.CurrentCard);
+                return;
+            }
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 6) {
+                battlelog.Append("FireElves know Dragons since they were little! Therefore they can dodge his attacks!\n");
+                battlelog.Append("FireElves defeats Dragon!\n");
+                player1.Deck.Remove(player2.CurrentCard);
+                player2.Deck.Add(player2.CurrentCard);
+                return;
+            }
+
             PrintDamagetoConsole();
 
             if(player1.CurrentCard.Damage > player2.CurrentCard.Damage) {
-                Console.WriteLine($"{player1.Name} wins!\n");
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
+                battlelog.Append($"{player1.Name} wins!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
             } else if (player1.CurrentCard.Damage < player2.CurrentCard.Damage) {
-                Console.WriteLine($"{player2.Name} wins!\n");
-                TransferCardtoRoundWinner(player2, player1.CurrentCard);
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
             } else {
-                Console.WriteLine("Draw!\n");
+                battlelog.Append("Draw!\n");
             }
 
             
@@ -118,24 +134,28 @@ namespace MTCGNew.Battle {
             float currentcarddamage1 = player1.CurrentCard.Damage;
             float currentcarddamage2 = player2.CurrentCard.Damage;
 
+            PrintDamagetoConsole();
+
             Rules.EffectivenessCheck(player1.CurrentCard, player2.CurrentCard);
 
+            battlelog.Append("Effectiveness have been applied!\n");
+
+            PrintDamagetoConsole();
+
             if (player1.CurrentCard.Damage > player2.CurrentCard.Damage) {
-                Console.WriteLine($"{player1.Name} wins!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player1.CurrentCard.Damage = currentcarddamage1;
                 player2.CurrentCard.Damage = currentcarddamage2;
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
             } else if (player1.CurrentCard.Damage < player2.CurrentCard.Damage) {
-                Console.WriteLine($"{player2.Name} wins!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.CurrentCard.Damage = currentcarddamage1;
                 player2.CurrentCard.Damage = currentcarddamage2;
-                TransferCardtoRoundWinner(player2, player1.CurrentCard);
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
             } else {
-                Console.WriteLine("Draw!\n");
+                battlelog.Append("Draw!\n");
                 player1.CurrentCard.Damage = currentcarddamage1;
                 player2.CurrentCard.Damage = currentcarddamage2;
 
@@ -144,24 +164,39 @@ namespace MTCGNew.Battle {
 
         private void MixedCardFight() {
             PrintRoundtoConsole();
-            
-            if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard)) {
-                Console.WriteLine("Kraken is imune to spells!\n");
-                Console.WriteLine("Kraken defeats Spell!\n");
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
+
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 7) {
+                battlelog.Append("Kraken is imune to spells!\n");
+                battlelog.Append("Kraken defeats Spell!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
             } 
             
-            if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard)) {
-                Console.WriteLine("Knight's armor is so heavy that the Waterspell makes him drown instantly!\n");
-                Console.WriteLine("Waterspell defeats Knight!\n");
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 8) {
+                battlelog.Append("Kraken is imune to spells!\n");
+                battlelog.Append("Kraken defeats Spell!\n");
+                player1.Deck.Remove(player1.CurrentCard);
+                player2.Deck.Add(player1.CurrentCard);
+                return;
+            }
+
+
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 9) {
+                battlelog.Append("Knight's armor is so heavy that the Waterspell makes him drown instantly!\n");
+                battlelog.Append("Waterspell defeats Knight!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
-            } 
+            }
+            
+            if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 10) {
+                battlelog.Append("Knight's armor is so heavy that the Waterspell makes him drown instantly!\n");
+                battlelog.Append("Waterspell defeats Knight!\n");
+                player1.Deck.Remove(player1.CurrentCard);
+                player2.Deck.Add(player1.CurrentCard);
+                return;
+            }
 
             PrintDamagetoConsole();
 
@@ -170,22 +205,24 @@ namespace MTCGNew.Battle {
 
             Rules.EffectivenessCheck(player1.CurrentCard, player2.CurrentCard);
 
+            battlelog.Append("Effectiveness have been applied!\n");
+
+            PrintDamagetoConsole();
+
             if (player1.CurrentCard.Damage > player2.CurrentCard.Damage) {
-                Console.WriteLine($"{player1.Name} wins!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player1.CurrentCard.Damage = currentcarddamage1;
                 player2.CurrentCard.Damage = currentcarddamage2;
-                TransferCardtoRoundWinner(player1, player2.CurrentCard);
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
             } else if (player1.CurrentCard.Damage < player2.CurrentCard.Damage) {
-                Console.WriteLine($"{player2.Name} wins!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.CurrentCard.Damage = currentcarddamage1;
                 player2.CurrentCard.Damage = currentcarddamage2;
-                TransferCardtoRoundWinner(player2, player1.CurrentCard);
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
             } else {
-                Console.WriteLine("Draw!\n");
+                battlelog.Append("Draw!\n");
                 player1.CurrentCard.Damage = currentcarddamage1;
                 player2.CurrentCard.Damage = currentcarddamage2;
             }
@@ -194,12 +231,12 @@ namespace MTCGNew.Battle {
         }
 
 
-        public void BattleLoop() {
-            Console.WriteLine($"Battle starts between {player1.Name} and {player2.Name}!");
+        public string BattleLoop() {
+            battlelog.Append($"Battle starts between {player1.Name} and {player2.Name}!\n");
             int round = 1;
             while(round <= MAXROUNDS) {
-                Console.WriteLine("===================================================");
-                Console.WriteLine($"Round {round} starts!");
+                battlelog.Append("===================================================\n");
+                battlelog.Append($"Round {round} starts!\n");
                 player1.CurrentCard = player1.Deck[RandomCardfromDeck(player1)];
                 player2.CurrentCard = player2.Deck[RandomCardfromDeck(player2)];
                 if(CardsareMonstercards(player1.CurrentCard, player2.CurrentCard)) {
@@ -212,28 +249,30 @@ namespace MTCGNew.Battle {
                     MixedCardFight();
                 }
                 if(player1.Deck.Count == 0) {
-                    Console.WriteLine($"{player1.Name} has no cards left! {player2.Name} wins!");
-                    Console.WriteLine($"Battle ends at Round {round}!");
-                    Console.WriteLine("===================================================");
+                    battlelog.Append($"{player1.Name} has no cards left! {player2.Name} wins!\n");
+                    battlelog.Append($"Battle ends at Round {round}!\n");
+                    battlelog.Append("===================================================\n");
                     player2.HasWon = true;
                     DeleteDeck(player1);
+                    TransferCardstoBattleWinner(player2, player2.Deck);
                     UpdateUserStats();
-                    return;
+                    return battlelog.ToString();
                 } else if (player2.Deck.Count == 0) {
-                    Console.WriteLine($"Battle ends at Round {round}!");
-                    Console.WriteLine("==================================================="); 
-                    Console.WriteLine($"{player2.Name} has no cards left! {player1.Name} wins!");
+                    battlelog.Append($"Battle ends at Round {round}!\n");
+                    battlelog.Append("===================================================\n"); 
+                    battlelog.Append($"{player2.Name} has no cards left! {player1.Name} wins!\n");
                     player1.HasWon = true;
                     DeleteDeck(player2);
+                    TransferCardstoBattleWinner(player1, player1.Deck);
                     UpdateUserStats();
-                    return;
+                    return battlelog.ToString();
                 }
-                Console.WriteLine($"Round {round} ends!");
-                Console.WriteLine("===================================================");
+                battlelog.Append($"Round {round} ends!\n");
+                battlelog.Append("===================================================\n");
                 round++;
             }
-            Console.WriteLine("Battle ends in a draw!");
-            return;
+            battlelog.Append("Battle ends in a draw!\n");
+            return battlelog.ToString();
         }
 
     }

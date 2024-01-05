@@ -21,8 +21,8 @@ namespace MTCGNew.Repositories {
             using var transaction = _dbconnection.BeginTransaction();
             lock(this) {
                 _dbcommand.CommandText = "SELECT username FROM users WHERE username = @comparison_username AND password = @comparison_password";
-                AddComparisonParameter(comparison_username, _dbcommand, "@comparison_username");
-                AddComparisonParameter(comparison_password, _dbcommand, "@comparison_password");
+                AddParameter(_dbcommand, "@comparison_username", comparison_username, DbType.String);
+                AddParameter(_dbcommand, "@comparison_password", comparison_password, DbType.String);
                 var reader = _dbcommand.ExecuteReader();
                 int usernameOrdinal = reader.GetOrdinal("username");
                 string? usernameValue = "";
@@ -37,12 +37,6 @@ namespace MTCGNew.Repositories {
             }
         }
 
-        private static void AddComparisonParameter(string comparison_param, IDbCommand _dbcommand, string parametername) {
-            IDbDataParameter parameter = _dbcommand.CreateParameter();
-            parameter.ParameterName = parametername;
-            parameter.Value = comparison_param;
-            _dbcommand.Parameters.Add(parameter);
-        }
 
     }
 }

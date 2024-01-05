@@ -30,8 +30,7 @@ namespace MCTGServer {
             Console.WriteLine($"Path: {rq.Path[1]}");
             var endpoint = _httpserver.Endpoints.ContainsKey(rq.Path[1]) ? _httpserver.Endpoints[rq.Path[1]] : null;
             if (endpoint == null || !endpoint.HandleRequest(rq, responder)) {
-                responder.ReturnCode = 404;
-                responder.ReturnText = "Not Found";
+                responder.SetResponse(404, "Not Found", "The requested resource could not be found.");
             }
 
             responder.SendResponse();

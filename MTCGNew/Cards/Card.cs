@@ -19,7 +19,16 @@ namespace MTCGNew.Cards {
 
         public CardType? Cardtype { get; set; }
 
+        public override string ToString() {
+            return $"Cardname: {Name}, Damage: {Damage}, Cardtype: {Cardtype}, Elementtype: {Elementtype}";
+        }
+
         public string SplitCardNameforSpecialty(string cardname) {
+
+            if(cardname == "FireElves" || cardname == "WaterSpell") {
+                return cardname;
+            }
+
             int uppercaseCount = 0;
             int index = 0;
 
@@ -35,15 +44,22 @@ namespace MTCGNew.Cards {
                 index++;
             }
 
+            if(index == cardname.Length) {
+                return cardname;
+            }
+
             return cardname.Substring(index);
 
         }
-        public void SetCardandElementtype() {
+        public void SetCardType() {
             if (this.Name.Contains("Spell")) {
-                this.Cardtype = CardType.spellcard;
+                this.Cardtype = CardType.spell;
             } else {
-                this.Cardtype = CardType.monstercard;
+                this.Cardtype = CardType.monster;
             }
+
+        }
+        public void SetElementType() {
             if (this.Name.Contains("Fire")) {
                 this.Elementtype = ElementType.fire;
             } else if (this.Name.Contains("Water")) {
@@ -51,7 +67,6 @@ namespace MTCGNew.Cards {
             } else {
                 this.Elementtype = ElementType.normal;
             }
-
-        }
+        } 
     }
 }

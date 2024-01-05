@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MTCGNew.Cards;
 
 namespace MTCGNew.Models {
-    internal class Stackcards {
+    public class Stackcards {
         public List<Card> Stack { get; set; } = new List<Card>();
     }
 }

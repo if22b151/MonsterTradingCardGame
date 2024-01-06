@@ -48,9 +48,9 @@ namespace MTCGNew.Battle {
             battlelog.Append($"{player1.CurrentCard.Damage} against {player2.CurrentCard.Damage}!\n");
         }
 
-        private void TransferCardstoBattleWinner(Player player, List<Card> deck) {
+        private void TransferCardstoBattleWinner(Player winner, Player looser, List<Card> deck) {
             Stackrepository stackrepository = new Stackrepository();
-            stackrepository.ChangeOwnerofCards(player.Name, deck);                
+            stackrepository.ChangeOwnerofCards(winner.Name, looser.Name, deck);                
         }
 
         private void UpdateUserStats() {
@@ -69,6 +69,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 1) {
                 battlelog.Append("Goblin is too afraid of Dragon\n");
                 battlelog.Append("Dragon defeats Goblin!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
                 return;
@@ -77,6 +78,7 @@ namespace MTCGNew.Battle {
             if(Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 2) {
                 battlelog.Append("Goblin is too afraid of Dragon\n");
                 battlelog.Append("Dragon defeats Goblin!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
@@ -85,6 +87,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 3) {
                 battlelog.Append("Wizzard controls Ork! Therefore Ork is not able to damage him!\n");
                 battlelog.Append("Wizzard defeats Ork!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
@@ -92,6 +95,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 4) {
                 battlelog.Append("Wizzard controls Ork! Therefore Ork is not able to damage him!\n");
                 battlelog.Append("Wizzard defeats Ork!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.Deck.Remove(player2.CurrentCard);
                 player2.Deck.Add(player2.CurrentCard);
                 return;
@@ -99,6 +103,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 5) {
                 battlelog.Append("FireElves know Dragons since they were little! Therefore they can dodge his attacks!\n");
                 battlelog.Append("FireElves defeats Dragon!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
@@ -106,6 +111,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 6) {
                 battlelog.Append("FireElves know Dragons since they were little! Therefore they can dodge his attacks!\n");
                 battlelog.Append("FireElves defeats Dragon!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.Deck.Remove(player2.CurrentCard);
                 player2.Deck.Add(player2.CurrentCard);
                 return;
@@ -168,6 +174,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 7) {
                 battlelog.Append("Kraken is imune to spells!\n");
                 battlelog.Append("Kraken defeats Spell!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
@@ -176,6 +183,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 8) {
                 battlelog.Append("Kraken is imune to spells!\n");
                 battlelog.Append("Kraken defeats Spell!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
                 return;
@@ -185,6 +193,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 9) {
                 battlelog.Append("Knight's armor is so heavy that the Waterspell makes him drown instantly!\n");
                 battlelog.Append("Waterspell defeats Knight!\n");
+                battlelog.Append($"{player1.Name} wins!\n");
                 player2.Deck.Remove(player2.CurrentCard);
                 player1.Deck.Add(player2.CurrentCard);
                 return;
@@ -193,6 +202,7 @@ namespace MTCGNew.Battle {
             if (Rules.CheckSpecialties(player1.CurrentCard, player2.CurrentCard) == 10) {
                 battlelog.Append("Knight's armor is so heavy that the Waterspell makes him drown instantly!\n");
                 battlelog.Append("Waterspell defeats Knight!\n");
+                battlelog.Append($"{player2.Name} wins!\n");
                 player1.Deck.Remove(player1.CurrentCard);
                 player2.Deck.Add(player1.CurrentCard);
                 return;
@@ -254,7 +264,7 @@ namespace MTCGNew.Battle {
                     battlelog.Append("===================================================\n");
                     player2.HasWon = true;
                     DeleteDeck(player1);
-                    TransferCardstoBattleWinner(player2, player2.Deck);
+                    TransferCardstoBattleWinner(player2, player1, player2.Deck);
                     UpdateUserStats();
                     return battlelog.ToString();
                 } else if (player2.Deck.Count == 0) {
@@ -263,7 +273,7 @@ namespace MTCGNew.Battle {
                     battlelog.Append($"{player2.Name} has no cards left! {player1.Name} wins!\n");
                     player1.HasWon = true;
                     DeleteDeck(player2);
-                    TransferCardstoBattleWinner(player1, player1.Deck);
+                    TransferCardstoBattleWinner(player1, player2, player1.Deck);
                     UpdateUserStats();
                     return battlelog.ToString();
                 }

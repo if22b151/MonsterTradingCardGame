@@ -1,4 +1,5 @@
-﻿using MTCGNew.Enums;
+﻿using Microsoft.VisualBasic;
+using MTCGNew.Enums;
 using MTCGNew.Models;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,25 @@ namespace MTCGNew.Cards {
     public class Card {
 
         //properties
-        public float Damage { get; set; }
-        public string Name { get; set; } = "";
         public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public float Damage { get; set; }
 
-        public ElementType? Elementtype { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public CardType Cardtype { get; set; }
 
-        public CardType? Cardtype { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ElementType Elementtype { get; set; }
+
 
         public override string ToString() {
-            return $"Cardname: {Name}, Damage: {Damage}, Cardtype: {Cardtype}, Elementtype: {Elementtype}";
+            return $"Id: {Id}, Cardname: {Name}, Damage: {Damage}, CardType: {Cardtype}, Elementtype: {Elementtype}";
         }
+
 
         public string SplitCardNameforSpecialty(string cardname) {
 
-            if(cardname == "FireElves" || cardname == "WaterSpell") {
+            if (cardname == "FireElves" || cardname == "WaterSpell") {
                 return cardname;
             }
 
@@ -44,7 +49,7 @@ namespace MTCGNew.Cards {
                 index++;
             }
 
-            if(index == cardname.Length) {
+            if (index == cardname.Length) {
                 return cardname;
             }
 
@@ -67,6 +72,8 @@ namespace MTCGNew.Cards {
             } else {
                 this.Elementtype = ElementType.normal;
             }
-        } 
+        }
+
+
     }
 }

@@ -85,10 +85,14 @@ namespace MTCGNew.Endpoints
                         responder.SetResponse(204, "No Content", "The request was fine, but the deck doesn't have any cards");
                         return;
                     }
+                    foreach (Card card in deck.Deck) {
+                        card.SetCardType();
+                        card.SetElementType();
+                    }
                     if (request.QueryParameters.ContainsKey("format") && request.QueryParameters["format"] == "plain") {
                         responder.SetResponse(200, "OK", deck.ToString(), "Content-Type", "format/plain");
                     } else {
-                        responder.SetResponse(200, "OK", JsonSerializer.Serialize(deck), "Content-Type", "application/json");
+                        responder.SetResponse(200, "OK", JsonSerializer.Serialize(deck.Deck), "Content-Type", "application/json");
 
                     }
                     return;

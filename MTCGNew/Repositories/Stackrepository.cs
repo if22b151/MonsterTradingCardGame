@@ -73,13 +73,14 @@ namespace MTCGNew.Repositories {
             
         }
 
-        public void ChangeOwnerofCards(string username, List<Card> deck) {
+        public void ChangeOwnerofCards(string winnerusername, string looserusername, List<Card> deck) {
             using IDbConnection _dbconnection = new NpgsqlConnection(_connection);
             using IDbCommand _dbcommand = _dbconnection.CreateCommand();
             _dbconnection.Open();
             foreach(Card card in deck) {
-                _dbcommand.CommandText = "UPDATE stack SET fk_user_id = (SELECT user_id FROM users WHERE username != @username) WHERE fk_card_id = @cardid AND fk_user_id != (SELECT user_id FROM users WHERE username = @username)";
-                AddParameter(_dbcommand, "@username", username, DbType.String);
+                _dbcommand.CommandText = "UPDATE stack SET fk_user_id = (SELECT user_id FROM users WHERE username = @winner) WHERE fk_card_id = @cardid AND fk_user_id = (SELECT user_id FROM users WHERE username = @looser)";
+                AddParameter(_dbcommand, "@winner", winnerusername, DbType.String);
+                AddParameter(_dbcommand, "@looser", looserusername, DbType.String);
                 AddParameter(_dbcommand, "@cardid", card.Id, DbType.String);
                 _dbcommand.ExecuteNonQuery();
                 _dbcommand.Parameters.Clear();

@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MTCGNew.Models;
+using MTCGNew.Cards;
+using System.Text.Json.Serialization;
 
 namespace MTCGNew.Endpoints {
     internal class Stackendpoint : IHTTPEndpoint {
@@ -41,7 +43,11 @@ namespace MTCGNew.Endpoints {
                         responder.SetResponse(204, "No Content", "The request was fine, but the user doesn't have any cards");
                         return;
                     }
-                    responder.SetResponse(200, "OK", JsonSerializer.Serialize(stack), "Content-Type", "application/json");
+                    foreach(Card card in stack.Stack) {
+                        card.SetCardType();
+                        card.SetElementType();
+                    }
+                    responder.SetResponse(200, "OK", JsonSerializer.Serialize(stack.Stack), "Content-Type", "application/json");
                     return;
                 }
                 catch (Exception e) {

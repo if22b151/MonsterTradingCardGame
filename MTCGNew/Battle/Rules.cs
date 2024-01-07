@@ -22,16 +22,20 @@ namespace MTCGNew.Battle {
             }
             if (currentcard1.Elementtype == ElementType.fire && currentcard2.Elementtype == ElementType.normal) {
                 currentcard1.Damage *= 2;
+                currentcard1.Damage /= 2;
                 return;
             } else if (currentcard2.Elementtype == ElementType.fire && currentcard1.Elementtype == ElementType.normal) {
                 currentcard2.Damage *= 2;
+                currentcard1.Damage /= 2;
                 return;
             }
             if (currentcard1.Elementtype == ElementType.normal && currentcard2.Elementtype == ElementType.water) {
                 currentcard1.Damage *= 2;
+                currentcard1.Damage /= 2;
                 return;
             } else if (currentcard2.Elementtype == ElementType.normal && currentcard1.Elementtype == ElementType.water) {
                 currentcard2.Damage *= 2;
+                currentcard1.Damage /= 2;
                 return;
             }
         }
